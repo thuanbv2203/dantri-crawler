@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 import sqlite3
 import urllib.request
 import zlib
@@ -7,11 +8,17 @@ import re
 import random
 from dantri import DanTri
 from HtmlParser import HtmlParser
+
+
+def write_log(content):
+  with open("misr.log", "a") as log_file:
+    log_file.write(content+ "\n")
+
 def get_content(url, page = 1, dbName = 'database.db', category=''):
   counter = page
   while True:
     print('page: ' + str(counter) + '----------------------------------------------')
-    dantris = []
+    dantri_list = []
     category_link = url + '/' + category + '/trang-' + str(counter) + '.htm'
     print(category_link)
     response = HtmlParser.get_html(category_link, loop = 5)
@@ -19,14 +26,14 @@ def get_content(url, page = 1, dbName = 'database.db', category=''):
       print('continue with another page')
       continue
     if not check_content(response):
-      print('break in check content')
+      write_log('Interrupt in category = ' + category + ', page = ' + str(page) + ', link = ' + category_link)
       break
     for index, link in enumerate(get_link_in_page(response)):
       dantri = DanTri(link, category)
       if not dantri.getValid():
         continue
-      dantris.append(dantri)
-    insert_data(dantris, dbName)
+      dantri_list.append(dantri)
+    insert_data(dantri_list, dbName)
     counter += 1
 
 def get_link_in_page(response):
@@ -60,7 +67,7 @@ def insert_data(datas, dbName):
       tags TEXT
       );''')
     for data in datas:
-      cur.execute("INSERT INTO DATA VALUES (NULL,'"+ data.page_id +"','"+ data.title +"','"+ data.category +"','"+ data.brief +"','"+ data.content +"','"+ data.time +"','"+ data.link +"','"+ data.author +"','"+ data.tags +"')")
+      cur.execute("INSERT INTO DATA VALUES (NULL,?,?,?,?,?,?,?,?,?)", (str(data.page_id),str(data.title),str(data.category),str(data.brief),str(data.content),str(data.time),str(data.link),str(data.author),str(data.tags)))
     conn.commit()
     conn.close()
   except Exception as e:
@@ -70,7 +77,5 @@ TOPIC = ['su-kien', 'xa-hoi', 'the-gioi', 'the-thao', 'giao-duc-khuyen-hoc', 'ta
 URL = 'http://dantri.com.vn/'
 
 # createDatabase('database1.db')
-get_content('http://dantri.com.vn', category = 'phap-luat')
-# print(check_link('http://dantri.com.vn/phap-luat/trang-6000.htm'))
-# print(random_proxy())
-# print(HtmlParser.get_html(' http://dantri.com.vn/phap-luat/ngao-da-nguoi-dan-ong-cam-tuyp-nuoc-nhua-doa-ban-cong-an-201608060809306.htm'))
+for category in TOPIC:
+  get_content(url = 'http://dantri.com.vn', page = 1, dbName = 'database.db', category=category)

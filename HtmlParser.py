@@ -3,6 +3,11 @@ import time
 import urllib.request
 from bs4 import BeautifulSoup
 import random
+
+def error_link_log(content):
+  with open("link.log", "a") as log_file:
+    log_file.write(content+ "\n")
+
 class HtmlParser:
   def __init__(self):
     self.proxies = []
@@ -22,21 +27,22 @@ class HtmlParser:
       print('Getting data from url: ' + url)
     response = ''
     try:
-      if error:
-        proxy_support = urllib.request.ProxyHandler({"http":HtmlParser.get_proxy()})
-        opener = urllib.request.build_opener(proxy_support)
-        r = opener.open(url)
-        response = r.read().decode('utf-8')
-      else:
-        req = urllib.request.Request(url)
-        req.add_header('User-agent', HtmlParser.get_useragent())
-        opener = urllib.request.urlopen(req, timeout = 100)
-        response = opener.read().decode('utf-8')
+      # if error:
+      #   proxy_support = urllib.request.ProxyHandler({"http":HtmlParser.get_proxy()})
+      #   opener = urllib.request.build_opener(proxy_support)
+      #   r = opener.open(url)
+      #   response = r.read().decode('utf-8')
+      # else:
+      req = urllib.request.Request(url)
+      req.add_header('User-agent', HtmlParser.get_useragent())
+      opener = urllib.request.urlopen(req, timeout = 100)
+      response = opener.read().decode('utf-8')
     except Exception as e:
       print('[ERROR]' + str(e))
       print('Try again in 5 seconds.')
       time.sleep(5)
       response = False
+      error_link_log(url)
       # if loop == 0:
       #   response = False
       # else:
