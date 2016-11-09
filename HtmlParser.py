@@ -27,12 +27,6 @@ class HtmlParser:
       print('Getting data from url: ' + url)
     response = ''
     try:
-      # if error:
-      #   proxy_support = urllib.request.ProxyHandler({"http":HtmlParser.get_proxy()})
-      #   opener = urllib.request.build_opener(proxy_support)
-      #   r = opener.open(url)
-      #   response = r.read().decode('utf-8')
-      # else:
       req = urllib.request.Request(url)
       req.add_header('User-agent', HtmlParser.get_useragent())
       opener = urllib.request.urlopen(req, timeout = 100)
@@ -43,9 +37,4 @@ class HtmlParser:
       time.sleep(5)
       response = False
       error_link_log(url)
-      # if loop == 0:
-      #   response = False
-      # else:
-      #   time.sleep(15)
-      #   response = HtmlParser.get_html(url, loop - 1, True)
     return response

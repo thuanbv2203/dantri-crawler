@@ -78,4 +78,4 @@ URL = 'http://dantri.com.vn/'
 
 # createDatabase('database1.db')
 for category in TOPIC:
-  get_content(url = 'http://dantri.com.vn', page = 1, dbName = 'database.db', category=category)
+  get_content(url = 'http://dantri.com.vn', page = 2023, dbName = 'database.db', category=category)

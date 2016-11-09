@@ -5,6 +5,10 @@ from HtmlParser import HtmlParser
 from bs4 import BeautifulSoup
 import re
 
+def write_log(content):
+  with open("misr.log", "a") as log_file:
+    log_file.write(content+ "\n")
+
 class DanTri:
   def __init__(self, link, category):
     response = HtmlParser.get_html(link, loop = 5)
@@ -12,17 +16,32 @@ class DanTri:
     if not response:
       self.setValid(False)
     else:
-      self.soup = BeautifulSoup(response, 'html.parser')
-      self.link = link.lstrip().rstrip()
-      self.category = category
-      self.page_id = self.get_pageid(link)
-      self.title = self.get_title()
-      self.brief = self.get_brief()
-      self.content = self.get_content()
-      self.time = self.get_time()
-      self.author = self.get_author()
-      self.tags = self.get_tags()
-  
+      try:
+        self.soup = BeautifulSoup(response, 'html.parser')
+        self.link = link.lstrip().rstrip()
+        self.category = category
+        self.page_id = self.get_pageid(link)
+        self.title = self.get_title()
+        self.brief = self.get_brief()
+        self.content = self.get_content()
+        self.time = self.get_time()
+        self.author = self.get_author()
+        self.tags = self.get_tags()
+      except Exception as e:
+        self.setValid(False)
+        write_log(link)
+        self.init()
+
+  def init(self):
+    self.link = ''
+    self.category = ''
+    self.page_id = ''
+    self.title = ''
+    self.brief = ''
+    self.content = ''
+    self.time = ''
+    self.author = ''
+    self.tags = ''
   def setValid(self, flag):
     self.isValid = flag
 
